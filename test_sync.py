@@ -7,7 +7,7 @@ def check():
     rooms.clear()
     with TestClient(app) as c:
         h=c.get('/health').json()
-        assert h['ok'] and h['version']=='1.5'
+        assert h['ok'] and h['version']=='1.7'
         r=c.post('/api/rooms/ABC123').json()
         code=r['room']; token=r['host_token']
         with c.websocket_connect(f'/ws/{code}?role=host&token={token}') as host:

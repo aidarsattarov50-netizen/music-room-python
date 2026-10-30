@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>Music Room 1.6 — Главная и музыкальный поиск</title>
+<title>Music Room 1.7 — Известные исполнители внутри сайта</title>
 <style>
 :root{color-scheme:dark;--bg:#10101c;--card:#1d1b30;--ink:#f5f2ff;--sub:#aaa6c0;--accent:#b6a2ff;--line:rgba(255,255,255,.10)}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 85% 0%,#292344 0,transparent 38%),var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink)}
@@ -147,7 +147,7 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
 #page-room .chat-alert{padding:0 14px}
 @media(max-width:820px){#page-room .chat-body{height:250px;max-height:none}}
 
-/* v1.6: home page, pet companion and a personal catalog player */
+/* v1.7: home page, pet companion and a personal catalog player */
 #page-home{display:block;min-height:72vh;max-width:1040px;margin:0 auto;padding:0 0 28px}
 .home-search-panel{border:1px solid #695b8c;background:linear-gradient(125deg,#29233e,#211b33 67%,#302441);border-radius:22px;padding:25px;margin-bottom:19px}
 .home-heading{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
@@ -189,6 +189,11 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
 .home-disclaimer{margin-top:12px;color:#a99ebc;font-size:11px;line-height:1.5}
 @media(max-width:800px){.home-main{grid-template-columns:1fr}.home-list{grid-template-columns:1fr}.home-search-panel{padding:18px}.home-search-panel h2{font-size:23px}}
 @media(max-width:480px){.home-result{flex-wrap:wrap}.home-cover{width:44px;height:44px;flex-basis:44px}.home-search-form button{flex:1}}
+#page-home[hidden]{display:none!important}
+.home-video-wrap{margin-top:18px;padding:14px;border:1px solid #715f9e;background:#111020;border-radius:16px}
+.home-video-aspect{width:100%;aspect-ratio:16/9;min-height:200px;background:#080812;border-radius:12px;overflow:hidden}
+.home-video-aspect iframe{display:block;width:100%;height:100%;min-height:200px;border:0}
+.home-video-wrap .home-disclaimer{margin-top:10px}
 </style>
 </head>
 <body>
@@ -285,20 +290,21 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
 <div class="hint">Сначала введи правильные Project URL и Publishable key, затем скачай файл <b>index.html</b> и размести его на хостинге. Друзьям больше не придётся вводить настройки сервера.</div>
 </div></div><section aria-label="Главная" class="view-page" hidden id="page-home">
   <section class="home-search-panel" aria-label="Поиск музыки">
-    <div class="home-heading"><div><span class="home-kicker">♫ Слушай и открывай новое</span><h2>Поиск музыки</h2></div><select id="homeSource" class="home-source" aria-label="Источник музыки"><option value="audius">Audius · полные треки</option><option value="catalog">Известные исполнители</option></select></div>
-    <p class="home-intro">Найди песню или исполнителя. На Audius можно слушать полные треки, а скачивать — только когда это разрешил автор. Во втором каталоге доступны официальные ссылки на музыку.</p>
+    <div class="home-heading"><div><span class="home-kicker">♫ Слушай и открывай новое</span><h2>Поиск музыки</h2></div><select id="homeSource" class="home-source" aria-label="Источник музыки"><option value="youtube" selected>YouTube · известные песни</option><option value="audius">Audius · независимые исполнители</option><option value="catalog">Каталог · 30 секунд</option></select></div>
+    <p class="home-intro">Ищи известные песни и слушай внутри Music Room через официальный YouTube-плеер. Для поиска YouTube администратору понадобится API-ключ; в других источниках можно слушать музыку и короткие фрагменты без него.</p>
     <form id="homeSearchForm" class="home-search-form"><label class="sr-only" for="homeQuery">Название песни или исполнитель</label><input id="homeQuery" type="search" maxlength="90" required minlength="2" placeholder="Например: lofi, Joji, ambient…" autocomplete="off"><button class="btn" id="homeSearchButton" type="submit">⌕ Найти</button></form>
     <div id="homeSearchStatus" class="home-result-status" role="status" aria-live="polite">Напиши название песни и нажми «Найти».</div>
     <div class="home-list" id="homeSearchResults"></div>
+    <div id="homeYoutubeWrap" class="home-video-wrap" hidden><div class="home-video-aspect"><div id="homeYoutubePlayer"></div></div><div id="homeYoutubeStatus" class="home-disclaimer">Выбери песню. Если браузер не запустит видео автоматически, нажми ▶ внутри плеера YouTube.</div></div>
     <div class="home-player"><span style="font-size:28px">♫</span><div class="home-player-info"><strong id="homeNowPlaying">Ничего не играет</strong><small id="homeNowArtist">Личный плеер · не влияет на музыкальную комнату</small></div><audio id="homeAudio" controls preload="none" aria-label="Личный музыкальный плеер"></audio></div>
-    <div class="home-disclaimer">Аудио Audius предоставляют исполнители. Скачивание зависит от разрешения автора; для других песен открывается официальная страница.</div>
+    <div class="home-disclaimer">YouTube: воспроизведение через официальный встроенный плеер, с видео и рекламой сервиса. Некоторые ролики не разрешают встраивание. Поиск YouTube заработает после добавления YOUTUBE_API_KEY на сервер Render.</div>
   </section>
   <div class="home-main">
     <section class="home-pet-card"><h2>◕ Твой питомец</h2><p>Питомец, которого ты создал. Его имя и цвет автоматически берутся из вкладки «Питомец».</p><div class="home-pet-stage" id="homePetStage" aria-live="polite"></div><button class="btn secondary tab-shortcut" data-go="pet" type="button" style="margin-top:16px">Изменить питомца</button></section>
-    <section class="home-own-card"><h2>♬ Мои песни</h2><p>Добавь MP3, WAV, M4A или OGG со своего устройства. Слушай и скачивай свои файлы без загрузки на сервер.</p><label class="sr-only" for="homeOwnFiles">Выбрать свои песни</label><input id="homeOwnFiles" type="file" accept=".mp3,.wav,.m4a,.ogg,audio/*" multiple><div class="home-own-list" id="homeOwnList"><span class="home-disclaimer">Здесь появятся выбранные песни. После обновления страницы их нужно выбрать заново.</span></div></section>
+    <section class="home-own-card"><h2>♬ Мои песни</h2><p>Выбирай MP3, WAV, M4A или OGG со своего устройства и слушай их здесь. Файлы не отправляются на сервер.</p><label class="sr-only" for="homeOwnFiles">Выбрать свои песни</label><input id="homeOwnFiles" type="file" accept=".mp3,.wav,.m4a,.ogg,audio/*" multiple><div class="home-own-list" id="homeOwnList"><span class="home-disclaimer">Здесь появятся выбранные песни. После обновления страницы их нужно выбрать заново.</span></div></section>
   </div>
 </section><section class="view-page single-page" hidden="hidden" id="page-studio"><div class="panel coming-panel"><div class="coming-icon">✦</div><h2>Студия</h2><p>Здесь появятся демозаписи, песни начинающих музыкантов, профили артистов и комментарии. Раздел ещё в разработке.</p><button class="btn tab-shortcut" data-go="room" type="button">Перейти в музыкальную комнату</button></div></section>
-<div class="foot">Music Room 1.6 · Python WebSocket управляет музыкой; Supabase отвечает за чат, питомцев и файлы. Гостям нужно один раз разрешить звук. Тестовый проект: доступ и загрузки требуют усиленной защиты.</div>
+<div class="foot">Music Room 1.7 · Python WebSocket управляет музыкой; Supabase отвечает за чат, питомцев и файлы. Гостям нужно один раз разрешить звук. Тестовый проект: доступ и загрузки требуют усиленной защиты.</div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -1393,14 +1399,50 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
  setInterval(()=>{if(connected&&!isHost()&&!guestApproved)askToJoin()},4000);
  setInterval(()=>{if(isYoutube(player.src)&&!$('youtubeBox').hidden)refreshProgress()},700);
 
- // v1.6: personal player is intentionally independent from the shared room player.
+ // v1.7: personal player is intentionally independent from the shared room player.
  const homeAudio=$('homeAudio');
+ let homeYTPlayer=null;
+ let homeYTReady=null;
+ let homeYTId='';
+ function pauseHomeYoutube(){
+   if(homeYTPlayer&&typeof homeYTPlayer.pauseVideo==='function'){
+     try{homeYTPlayer.pauseVideo()}catch(e){}
+   }
+ }
+ async function playHomeYoutube(id,title,artist){
+   if(!/^[A-Za-z0-9_-]{11}$/.test(String(id||'')))return;
+   homeAudio.pause();
+   $('homeNowPlaying').textContent=title;
+   $('homeNowArtist').textContent=artist+' · YouTube';
+   $('homeYoutubeWrap').hidden=false;
+   $('homeYoutubeStatus').textContent='Если видео не началось, нажми ▶ на встроенном плеере YouTube.';
+   try{
+     if(!homeYTReady){
+       homeYTReady=youtubeApi().then(YT=>new Promise(resolve=>{
+         const opts={playsinline:1,controls:1,rel:0};
+         if(location.protocol==='https:'||location.protocol==='http:')opts.origin=location.origin;
+         homeYTPlayer=new YT.Player('homeYoutubePlayer',{
+           width:'100%',height:'100%',playerVars:opts,
+           events:{
+             onReady:e=>resolve(e.target),
+             onError:e=>{$('homeYoutubeStatus').textContent=e.data===101||e.data===150?'Автор запретил воспроизведение этого видео на других сайтах. Выбери другой результат.':'YouTube не воспроизводит это видео (ошибка '+e.data+').';},
+             onAutoplayBlocked:()=>{$('homeYoutubeStatus').textContent='Браузер заблокировал автозапуск — нажми ▶ внутри видео.';},
+           }
+         });
+       })).catch(err=>{homeYTReady=null;throw err});
+     }
+     const playerInstance=await homeYTReady;
+     if(id!==homeYTId){homeYTId=id;playerInstance.cueVideoById(id)}
+     playerInstance.playVideo();
+   }catch(err){homeStatus('Не удалось запустить YouTube: '+(err.message||err));}
+ }
  let localHomeFiles=[];
  let homeSearchSerial=0;
  const homeStatus=s=>{$('homeSearchStatus').textContent=s};
  const homeText=(tag,content,className='')=>{const el=document.createElement(tag);if(className)el.className=className;el.textContent=content;return el};
  function playHome(url,title,artist){
    if(!url)return;
+   pauseHomeYoutube();
    homeAudio.pause();
    homeAudio.src=url;
    $('homeNowPlaying').textContent=title;
@@ -1421,13 +1463,15 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
    const content=document.createElement('div');content.className='home-track-info';
    content.append(homeText('div',track.title||'Без названия','home-track-title'),homeText('div',track.artist||'Исполнитель','home-track-artist'));
    const actions=document.createElement('div');actions.className='home-track-actions';
-   if(track.stream){
-     const play=homeText('button','▶ Слушать','btn');play.type='button';play.addEventListener('click',()=>playHome(track.stream,track.title,track.artist));actions.append(play);
+   if(track.youtubeId){
+     const play=homeText('button','▶ Смотреть и слушать','btn');play.type='button';
+     play.addEventListener('click',()=>playHomeYoutube(track.youtubeId,track.title,track.artist));actions.append(play);
+   }else if(track.stream||track.preview){
+     const play=homeText('button',track.preview?'▶ Фрагмент 30 сек':'▶ Слушать','btn');play.type='button';
+     play.addEventListener('click',()=>playHome(track.stream||track.preview,track.title,track.artist));actions.append(play);
    }
-   if(track.download){
-     const dl=homeLink(track.download,'↓ Скачать');if(dl){dl.title='Доступно, если автор разрешил скачивание';actions.append(dl)}
-   }
-   const open=homeLink(track.url||'',track.provider==='catalog'?'Открыть в Apple Music':'Открыть на Audius');
+   const labels={catalog:'Открыть в Apple Music',youtube:'Открыть в YouTube',audius:'Открыть на Audius'};
+   const open=homeLink(track.url||'',labels[track.provider]||'Открыть источник');
    if(open)actions.append(open);
    content.append(actions);item.append(art,content);return item;
  }
@@ -1443,18 +1487,17 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
      if(!r.ok)throw Error(typeof data.detail==='string'?data.detail:'Каталог не ответил');
      const found=Array.isArray(data.results)?data.results:[];
      found.forEach(track=>$('homeSearchResults').append(homeResultItem(track)));
-     homeStatus(found.length?`Найдено песен: ${found.length}. ${source==='catalog'?'Открывай официальные страницы для прослушивания.':'Нажми «Слушать» для полного трека.'}`:'Ничего не найдено. Попробуй другое название или источник.');
+     homeStatus(found.length?`Найдено результатов: ${found.length}. ${source==='catalog'?'Предпрослушивания по 30 секунд.':source==='youtube'?'Нажми «Смотреть и слушать» для воспроизведения внутри сайта.':'Нажми «Слушать» для полного трека.'}`:'Ничего не найдено. Попробуй другое название или источник.');
    }catch(err){if(id===homeSearchSerial)homeStatus('Ошибка поиска: '+String(err.message||err));}
    finally{if(id===homeSearchSerial)$('homeSearchButton').disabled=false}
  });
- $('homeSource').addEventListener('change',()=>{homeSearchSerial++;$('homeSearchButton').disabled=false;$('homeSearchResults').replaceChildren();homeStatus($('homeSource').value==='audius'?'Audius: полные треки, скачивание только по разрешению автора.':'Каталог известных песен: ссылки на официальное прослушивание.')});
+ $('homeSource').addEventListener('change',()=>{homeSearchSerial++;$('homeSearchButton').disabled=false;$('homeSearchResults').replaceChildren();homeStatus($('homeSource').value==='youtube'?'YouTube: полные песни через встроенный плеер, нужен API-ключ сервера.':$('homeSource').value==='audius'?'Audius: полные треки независимых артистов.':'Каталог известных песен: фрагменты по 30 секунд.')});
  function renderHomeOwn(){
    const root=$('homeOwnList');root.replaceChildren();
    for(const track of localHomeFiles){
      const row=document.createElement('div');row.className='home-own-item';row.append(homeText('span',track.name));
      const act=document.createElement('div');act.className='home-track-actions';
      const play=homeText('button','▶','btn secondary');play.type='button';play.title='Слушать';play.addEventListener('click',()=>playHome(track.url,track.name,'Моя песня'));act.append(play);
-     const download=homeText('a','↓ Скачать','home-small-link');download.href=track.url;download.download=track.name;act.append(download);
      row.append(act);root.append(row);
    }
  }
@@ -1472,6 +1515,7 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
  function showTab(name){
    const valid=['home','studio','room','pet'];
    if(!valid.includes(name))name='home';
+   if(name!=='home')pauseHomeYoutube();
    for(const key of valid){const pane=$('page-'+key);if(pane)pane.hidden=key!==name;}
    document.querySelectorAll('[data-tab]').forEach(button=>{
      const active=button.dataset.tab===name;

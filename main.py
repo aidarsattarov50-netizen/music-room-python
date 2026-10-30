@@ -6,6 +6,7 @@ stay in Supabase Storage; this backend transports control state, never MP3 data.
 import asyncio
 import os
 import httpx
+from html import unescape
 import hmac
 import re
 import secrets
@@ -22,7 +23,7 @@ ROOT = Path(__file__).resolve().parent
 ROOM_CODE = re.compile(r"^[A-Z0-9]{6,8}$")
 YT = re.compile(r"^youtube://[A-Za-z0-9_-]{11}$")
 MAX_ROOMS = 200
-VERSION = "1.6"
+VERSION = "1.7"
 BOOT_ID = secrets.token_hex(8)
 
 
@@ -84,11 +85,14 @@ AUDIUS = "https://api.audius.co/v1"
 APPLE = "https://itunes.apple.com/search"
 APP_NAME = "music-room-demo"
 AUDIUS_KEY = os.getenv("AUDIUS_API_KEY", "").strip()
+YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY", "").strip()
+YOUTUBE_VIDEO_ID = re.compile(r"^[A-Za-z0-9_-]{11}$")
+YOUTUBE_SEARCH = "https://www.googleapis.com/youtube/v3/search"
 TRACK_ID = re.compile(r"^[A-Za-z0-9_-]{1,40}$")
 
 
 def audius_headers():
-    headers = {"Accept": "application/json", "User-Agent": "MusicRoom/1.6"}
+    headers = {"Accept": "application/json", "User-Agent": "MusicRoom/1.7"}
     if AUDIUS_KEY:
         headers["x-api-key"] = AUDIUS_KEY
     return headers
@@ -119,6 +123,41 @@ async def music_search(q: str = Query(min_length=2, max_length=90), source: str 
     q = q.strip()
     if len(q) < 2:
         raise HTTPException(400, "Название песни должно содержать хотя бы 2 символа")
+    if source == "youtube":
+        if not YOUTUBE_API_KEY:
+            raise HTTPException(503, "YouTube-поиск ещё не настроен: добавь YOUTUBE_API_KEY в Render → Environment. До этого можно слушать 30-секундные фрагменты в каталоге известных исполнителей.")
+        try:
+            result = await get_provider_json(YOUTUBE_SEARCH, {
+                "part": "snippet", "type": "video", "q": q,
+                "maxResults": 12, "videoEmbeddable": "true",
+                "videoSyndicated": "true", "safeSearch": "moderate",
+                "key": YOUTUBE_API_KEY,
+            })
+        except HTTPException as exc:
+            raise HTTPException(502, "Не удалось получить результаты YouTube. Проверь ключ, включение YouTube Data API v3 и квоту в Google Cloud.") from exc
+        results = []
+        for video in result.get("items", []) if isinstance(result.get("items"), list) else []:
+            if not isinstance(video, dict):
+                continue
+            vid = video.get("id") or {}
+            vid = vid.get("videoId", "") if isinstance(vid, dict) else ""
+            if not YOUTUBE_VIDEO_ID.fullmatch(str(vid)):
+                continue
+            snippet = video.get("snippet") or {}
+            if not isinstance(snippet, dict):
+                continue
+            pictures = snippet.get("thumbnails") or {}
+            picture = (pictures.get("medium") or pictures.get("default") or {}) if isinstance(pictures, dict) else {}
+            cover = picture.get("url", "") if isinstance(picture, dict) else ""
+            results.append({
+                "id": vid, "youtubeId": vid,
+                "title": unescape(str(snippet.get("title") or "Видео"))[:150],
+                "artist": unescape(str(snippet.get("channelTitle") or "YouTube"))[:100],
+                "artwork": cover if isinstance(cover, str) and cover.startswith("https://") else "",
+                "url": "https://www.youtube.com/watch?v=" + vid,
+                "stream": "", "download": "", "provider": "youtube",
+            })
+        return {"results": results, "source": "youtube"}
     if source == "audius":
         result = await get_provider_json(f"{AUDIUS}/tracks/search",
             {"query": q, "limit": 14, "app_name": APP_NAME}, audius=True)
@@ -139,7 +178,7 @@ async def music_search(q: str = Query(min_length=2, max_length=90), source: str 
                 "artist": str(artist.get("name") or "Исполнитель")[:80] if isinstance(artist, dict) else "Исполнитель",
                 "artwork": cover if isinstance(cover, str) and cover.startswith("https://") else "",
                 "url": canonical, "stream": f"/api/music/tracks/{track_id}/stream",
-                "download": f"/api/music/tracks/{track_id}/download" if audius_downloadable(tr) else "",
+                "download": "",
                 "duration": int(tr.get("duration") or 0), "provider": "audius"})
         return {"results": items, "source": "audius"}
     if source == "catalog":
@@ -154,7 +193,7 @@ async def music_search(q: str = Query(min_length=2, max_length=90), source: str 
             items.append({"id": str(tr.get("trackId") or ""), "title": str(tr.get("trackName") or "Без названия")[:100],
                 "artist": str(tr.get("artistName") or "Исполнитель")[:80],
                 "artwork": cover if cover.startswith("https://") else "",
-                "url": link, "stream": "", "download": "", "duration": int(tr.get("trackTimeMillis") or 0)//1000,
+                "url": link, "stream": "", "preview": str(tr.get("previewUrl") or "") if str(tr.get("previewUrl") or "").startswith("https://") else "", "download": "", "duration": int(tr.get("trackTimeMillis") or 0)//1000,
                 "provider": "catalog"})
         return {"results": items, "source": "catalog"}
     raise HTTPException(400, "Неизвестный музыкальный источник")
@@ -166,16 +205,6 @@ async def music_stream(track_id: str):
         raise HTTPException(400, "Неверный ID песни")
     return RedirectResponse(f"{AUDIUS}/tracks/{track_id}/stream?app_name={APP_NAME}", status_code=307)
 
-
-@app.get("/api/music/tracks/{track_id}/download")
-async def music_download(track_id: str):
-    if not TRACK_ID.fullmatch(track_id):
-        raise HTTPException(400, "Неверный ID песни")
-    data = await get_provider_json(f"{AUDIUS}/tracks/{track_id}", {"app_name": APP_NAME}, audius=True)
-    tr = data.get("data", {})
-    if not isinstance(tr, dict) or not audius_downloadable(tr):
-        raise HTTPException(403, "Автор не разрешил свободное скачивание этой песни")
-    return RedirectResponse(f"{AUDIUS}/tracks/{track_id}/download?app_name={APP_NAME}", status_code=307)
 
 
 @app.post("/api/rooms/{code}", status_code=201)
