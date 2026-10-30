@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 
 <html lang="ru">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>Music Room 1.4 — Python + WebSocket</title>
+<title>Music Room 1.6 — Главная и музыкальный поиск</title>
 <style>
 :root{color-scheme:dark;--bg:#10101c;--card:#1d1b30;--ink:#f5f2ff;--sub:#aaa6c0;--accent:#b6a2ff;--line:rgba(255,255,255,.10)}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 85% 0%,#292344 0,transparent 38%),var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink)}
@@ -147,6 +146,49 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
 #page-room .chat-hint{padding:0 14px 12px}
 #page-room .chat-alert{padding:0 14px}
 @media(max-width:820px){#page-room .chat-body{height:250px;max-height:none}}
+
+/* v1.6: home page, pet companion and a personal catalog player */
+#page-home{display:block;min-height:72vh;max-width:1040px;margin:0 auto;padding:0 0 28px}
+.home-search-panel{border:1px solid #695b8c;background:linear-gradient(125deg,#29233e,#211b33 67%,#302441);border-radius:22px;padding:25px;margin-bottom:19px}
+.home-heading{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.home-kicker{color:#c2aaff;font-size:12px;font-weight:750;letter-spacing:1.5px;text-transform:uppercase}
+.home-search-panel h2{font-size:26px;letter-spacing:-.5px;margin:5px 0 8px}
+.home-intro{color:#c0b6d4;font-size:13px;line-height:1.6;margin:0 0 16px}
+.home-source{border:1px solid #726389;border-radius:10px;padding:11px;background:#181527;color:#f7f2ff;min-width:190px}
+.home-search-form{display:flex;gap:9px;align-items:stretch;flex-wrap:wrap}
+.home-search-form input{flex:1;min-width:180px;background:#171525;color:#fff;border:1px solid #796a9d;border-radius:12px;padding:12px 14px}
+.home-search-form .btn{min-width:110px}
+.home-result-status{font-size:12px;color:#d2c7e9;margin-top:12px;min-height:18px}
+.home-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.home-result{display:flex;gap:11px;align-items:center;padding:12px;border:1px solid #685780;background:#1a1728;border-radius:14px;min-width:0}
+.home-cover{width:54px;height:54px;flex:0 0 54px;border-radius:10px;background:linear-gradient(135deg,#9d80e4,#44375f);object-fit:cover}
+.home-track-info{flex:1;min-width:0}
+.home-track-title{font-size:13px;font-weight:760;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.home-track-artist{font-size:11px;color:#b7aace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:4px 0}
+.home-track-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.home-track-actions .btn{padding:6px 10px;font-size:11px}
+.home-track-actions a{font-size:11px;color:#d9c7ff;align-self:center;padding:5px 1px}
+.home-player{display:flex;align-items:center;gap:12px;padding:14px;border-radius:15px;background:#131321;border:1px solid #594b75;margin-top:15px;flex-wrap:wrap}
+.home-player-info{flex:1;min-width:140px}
+.home-player-info strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+.home-player-info small{display:block;color:#bcb1ce;margin-top:4px}
+.home-player audio{width:100%;height:35px;min-width:150px;flex:1 1 250px}
+.home-main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:17px}
+.home-pet-card,.home-own-card{border:1px solid #564973;background:#211c31;border-radius:20px;padding:20px}
+.home-pet-card h2,.home-own-card h2{margin:0 0 7px;font-size:17px}
+.home-pet-card p,.home-own-card p{color:#bfb5d3;font-size:12px;line-height:1.55}
+.home-pet-stage{height:275px;margin-top:16px;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center bottom,#5b4676,#2c2645 68%,#211d36 100%);border:1px solid #6b5487;border-radius:16px;overflow:hidden}
+.home-pet-stage .pet-slot{transform:scale(1.8);transform-origin:center;min-width:110px}
+.home-pet-stage .pet{animation-duration:3s}
+.home-own-card input[type=file]{width:100%;font-size:12px;color:#e5dcf7;margin:12px 0}
+.home-own-card input[type=file]::file-selector-button{background:#43365d;color:white;border:1px solid #806aab;padding:10px 13px;border-radius:9px;margin-right:7px;cursor:pointer}
+.home-own-list{display:grid;gap:9px;margin-top:12px}
+.home-own-item{border-top:1px solid #4e4168;padding:10px 0;font-size:12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:space-between}
+.home-own-item span{min-width:0;max-width:210px;overflow-wrap:anywhere}
+.home-small-link{color:#decaff;font-size:12px;text-decoration:none}
+.home-disclaimer{margin-top:12px;color:#a99ebc;font-size:11px;line-height:1.5}
+@media(max-width:800px){.home-main{grid-template-columns:1fr}.home-list{grid-template-columns:1fr}.home-search-panel{padding:18px}.home-search-panel h2{font-size:23px}}
+@media(max-width:480px){.home-result{flex-wrap:wrap}.home-cover{width:44px;height:44px;flex-basis:44px}.home-search-form button{flex:1}}
 </style>
 </head>
 <body>
@@ -173,6 +215,7 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
 <div class="music-progress"><span class="music-time" id="musicCurrent">0:00</span><input aria-label="Перемотка песни" disabled="" id="musicSeek" max="100" min="0" step="0.1" type="range" value="0"/><span class="music-time" id="musicDuration">0:00</span></div>
 <div class="music-skip"><button class="btn secondary" disabled="" id="musicBack" type="button">⏪ −10 сек</button><button class="btn secondary" disabled="" id="musicForward" type="button">+10 сек ⏩</button><span class="music-hint">Ползунок — для точной перемотки</span></div>
 <div class="music-actions"><button class="btn" disabled="" id="musicPlay" type="button">▶ Играть</button><button class="btn secondary" disabled="" id="musicPause" type="button">⏸ Пауза</button><button class="btn secondary" hidden="" id="musicSound" type="button">🔊 Включить звук</button><label class="music-volume">Громкость <input aria-label="Моя громкость" id="musicVolume" max="100" min="0" type="range" value="65"/></label></div>
+<div aria-live="polite" class="music-hint python-connection" id="pythonLinkStatus">🔴 Сервер музыки: пока нет соединения</div>
 <div aria-live="polite" class="music-hint" id="syncStatus">⏱ Состояние плеера получает ведущий, остальные устройства повторяют воспроизведение. Для звука у гостя нужно одно нажатие.</div>
 <div class="host-tools" hidden="" id="hostTools">
 <label class="music-label" for="musicTitleInput">Название песни</label><input class="music-field" id="musicTitleInput" maxlength="80" placeholder="Название трека" value="The Weeknd — Call Out My Name"/>
@@ -240,8 +283,22 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
 </details>
 <button class="btn secondary full" id="export" type="button">↓ Скачать HTML для публикации</button>
 <div class="hint">Сначала введи правильные Project URL и Publishable key, затем скачай файл <b>index.html</b> и размести его на хостинге. Друзьям больше не придётся вводить настройки сервера.</div>
-</div></div><section aria-label="Главная — пустая страница" class="view-page blank-home" hidden="hidden" id="page-home"></section><section class="view-page single-page" hidden="hidden" id="page-studio"><div class="panel coming-panel"><div class="coming-icon">✦</div><h2>Студия</h2><p>Здесь появятся демозаписи, песни начинающих музыкантов, профили артистов и комментарии. Раздел ещё в разработке.</p><button class="btn tab-shortcut" data-go="room" type="button">Перейти в музыкальную комнату</button></div></section>
-<div class="foot">Music Room 1.4 · Python WebSocket управляет музыкой; Supabase отвечает за чат, питомцев и файлы. Гостям нужно один раз разрешить звук. Тестовый проект: доступ и загрузки требуют усиленной защиты.</div>
+</div></div><section aria-label="Главная" class="view-page" hidden id="page-home">
+  <section class="home-search-panel" aria-label="Поиск музыки">
+    <div class="home-heading"><div><span class="home-kicker">♫ Слушай и открывай новое</span><h2>Поиск музыки</h2></div><select id="homeSource" class="home-source" aria-label="Источник музыки"><option value="audius">Audius · полные треки</option><option value="catalog">Известные исполнители</option></select></div>
+    <p class="home-intro">Найди песню или исполнителя. На Audius можно слушать полные треки, а скачивать — только когда это разрешил автор. Во втором каталоге доступны официальные ссылки на музыку.</p>
+    <form id="homeSearchForm" class="home-search-form"><label class="sr-only" for="homeQuery">Название песни или исполнитель</label><input id="homeQuery" type="search" maxlength="90" required minlength="2" placeholder="Например: lofi, Joji, ambient…" autocomplete="off"><button class="btn" id="homeSearchButton" type="submit">⌕ Найти</button></form>
+    <div id="homeSearchStatus" class="home-result-status" role="status" aria-live="polite">Напиши название песни и нажми «Найти».</div>
+    <div class="home-list" id="homeSearchResults"></div>
+    <div class="home-player"><span style="font-size:28px">♫</span><div class="home-player-info"><strong id="homeNowPlaying">Ничего не играет</strong><small id="homeNowArtist">Личный плеер · не влияет на музыкальную комнату</small></div><audio id="homeAudio" controls preload="none" aria-label="Личный музыкальный плеер"></audio></div>
+    <div class="home-disclaimer">Аудио Audius предоставляют исполнители. Скачивание зависит от разрешения автора; для других песен открывается официальная страница.</div>
+  </section>
+  <div class="home-main">
+    <section class="home-pet-card"><h2>◕ Твой питомец</h2><p>Питомец, которого ты создал. Его имя и цвет автоматически берутся из вкладки «Питомец».</p><div class="home-pet-stage" id="homePetStage" aria-live="polite"></div><button class="btn secondary tab-shortcut" data-go="pet" type="button" style="margin-top:16px">Изменить питомца</button></section>
+    <section class="home-own-card"><h2>♬ Мои песни</h2><p>Добавь MP3, WAV, M4A или OGG со своего устройства. Слушай и скачивай свои файлы без загрузки на сервер.</p><label class="sr-only" for="homeOwnFiles">Выбрать свои песни</label><input id="homeOwnFiles" type="file" accept=".mp3,.wav,.m4a,.ogg,audio/*" multiple><div class="home-own-list" id="homeOwnList"><span class="home-disclaimer">Здесь появятся выбранные песни. После обновления страницы их нужно выбрать заново.</span></div></section>
+  </div>
+</section><section class="view-page single-page" hidden="hidden" id="page-studio"><div class="panel coming-panel"><div class="coming-icon">✦</div><h2>Студия</h2><p>Здесь появятся демозаписи, песни начинающих музыкантов, профили артистов и комментарии. Раздел ещё в разработке.</p><button class="btn tab-shortcut" data-go="room" type="button">Перейти в музыкальную комнату</button></div></section>
+<div class="foot">Music Room 1.6 · Python WebSocket управляет музыкой; Supabase отвечает за чат, питомцев и файлы. Гостям нужно один раз разрешить звук. Тестовый проект: доступ и загрузки требуют усиленной защиты.</div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -413,6 +470,7 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
  const audio=$('sharedAudio'); audio.volume=.65;
  let player={src:'',title:'',playing:false,position:0,at:0,seq:0};
  let musicWs=null,musicWsRoom='',musicWsMode='',musicConnecting=false,lastMusicPing=0;
+ let lastServerRefresh=0, hostCommandId=0, hostAckId=0, wsConnectionSerial=0;
  let musicHostTokens=get('musicroom-python-host-tokens',{});
 
  let lastApplied='',hostSession='',soundEnabled=false,playerBusy=false;
@@ -421,6 +479,7 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
  let clockOffsetMs=0,clockKnown=false,bestClockRTT=Infinity,clockPings=new Map();
  let lastClockPing=0,stateReceivedAt=Date.now(),clockHost='';
  const syncText=s=>{const el=$('syncStatus');if(el)el.textContent=s};
+ const pythonLink=s=>{const el=$('pythonLinkStatus');if(el)el.textContent=s};
  function resetClock(){clockOffsetMs=0;clockKnown=false;bestClockRTT=Infinity;clockPings.clear();lastClockPing=0;stateReceivedAt=Date.now()}
  const hostNow=()=>Date.now()+(!isHost()&&clockKnown?clockOffsetMs:0);
  function pingClock(force=false){
@@ -553,7 +612,7 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
    // Роль ведущего закреплена за этой комнатой и не исчезает при временной
    // потере Realtime-соединения (например, при анонимной авторизации).
    const owner=isHost();
-   if(owner)syncText(connected?'⏱ Ведущий · другие устройства сверяют время с твоим плеером.':'⏱ Ты ведущий · связь временно отсутствует.');
+   // Do not overwrite connection state here: Supabase online does not mean Python WebSocket online.
    $('hostTools').hidden=!owner;
    $('guestTools').hidden=!connected||owner||!guestApproved;
    $('musicSound').hidden=!connected||owner||!guestApproved;
@@ -725,10 +784,11 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
  async function publishPlayer(action){
    if(!isHost())return;
    if(!musicWs||musicWs.readyState!==WebSocket.OPEN){
-     musicNote('⚠ Сервер музыки недоступен. Подключи Python-сервер (Render). Изменение пока только у тебя.');
+     pythonLink('🔴 Сервер музыки отключён — команды другим устройствам не доходят');
+     musicNote('⚠ Сервер музыки недоступен. Команда не отправлена другим устройствам.');
      return;
    }
-   const payload={type:'command',action};
+   const payload={type:'command',action,commandId:++hostCommandId};
    if(action==='track'){payload.src=player.src;payload.title=player.title}
    else payload.position=Number.isFinite(player.position)?player.position:mediaTime();
    musicWs.send(JSON.stringify(payload));
@@ -807,7 +867,7 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
        p.playVideo();
      }else await audio.play();
      player.playing=true;player.position=mediaTime();player.at=Date.now();
-     if(connected){await publishPlayer('play');musicNote(musicWs&&musicWs.readyState===WebSocket.OPEN?'▶ Команда отправлена Python-серверу.':'▶ Играет локально — Python-сервер не подключён.');}
+     if(connected){await publishPlayer('play');musicNote(musicWs&&musicWs.readyState===WebSocket.OPEN?'▶ Команда отправлена Python-серверу.':'⚠ Играет только у тебя: Python-сервер не подключён.');}
      else{applyPlayerVisibility();musicNote('▶ Играет только у тебя. Восстанавливаем связь, чтобы синхронизировать с друзьями.');}
    }catch(e){musicNote('Не получается проиграть трек: '+e.message+'. Проверь ссылку и интернет.')}finally{playerBusy=false}
  });
@@ -895,6 +955,7 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
  // Guests cannot send play/pause/seek. The Python room has one owner connection.
  function closeMusicSocket(){
    const previous=musicWs;musicWs=null;musicWsRoom='';musicWsMode='';musicConnecting=false;
+   pythonLink('🔴 Сервер музыки: отключено');
    if(previous){previous.onclose=null;try{previous.close()}catch{}}
  }
  function onPythonPong(p){
@@ -907,7 +968,7 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
      clockOffsetMs=!clockKnown?offset:clockOffsetMs*.2+offset*.8;
      bestClockRTT=Math.min(bestClockRTT,rtt);clockKnown=true;
    }
-   syncText('🐍 Python-сервер · задержка сети ≈ '+Math.round(rtt)+' мс · коррекция позиции включена');
+   syncText('⏱ Python-сервер · задержка сети ≈ '+Math.round(rtt)+' мс · коррекция позиции включена');
  }
  async function ensureMusicSocket(){
    if(!connected||!admitted()||musicConnecting)return;
@@ -915,6 +976,7 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
    if(musicWs&&(musicWs.readyState===WebSocket.OPEN||musicWs.readyState===WebSocket.CONNECTING)&&musicWsRoom===room&&musicWsMode===desiredMode)return;
    closeMusicSocket();
    musicConnecting=true;
+   pythonLink('🟡 Сервер музыки: устанавливаем WebSocket-соединение…');
    const targetRoom=room;
    try{
      let secret='';
@@ -936,10 +998,15 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
      if(secret)qs.set('token',secret);
      const socket=new WebSocket(proto+'//'+location.host+'/ws/'+targetRoom+'?'+qs);
      musicWs=socket;musicWsRoom=targetRoom;musicWsMode=desiredMode;
+     const serial=++wsConnectionSerial;
+     // A restarted Python process begins seq at zero. Do not discard its fresh state.
+     if(desiredMode==='guest'){player.seq=-1;stateReceivedAt=Date.now()}
+     lastServerRefresh=0;
      socket.onopen=()=>{
        if(socket!==musicWs)return;
        musicConnecting=false;
-       syncText('🐍 Подключено к Python-серверу · музыка синхронизируется');
+       pythonLink('🟢 Python WebSocket подключён · '+(desiredMode==='host'?'ведущий':'слушатель')+' · комната '+targetRoom);
+       syncText('⏱ Сверяем время с Python-сервером…');
        pingClock(true);
        socket.send(JSON.stringify({type:'get_state'}));
      };
@@ -951,28 +1018,55 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
        if(p.type!=='state')return;
        const next=safeMusicState(p.state);if(!next)return;
        if(isHost()){
-         const needsLoad=next.src!==player.src||next.playing!==player.playing;
-         if(needsLoad)syncPlayer(next,true);
-         else{player=next;applyPlayerVisibility();refreshProgress()}
+         // Server responses can arrive AFTER the host has already clicked Play/Pause.
+         // Never reverse a newer local command because an older acknowledgement arrived.
+         const acknowledged=Number(p.commandId);
+         if(Number.isSafeInteger(acknowledged)&&acknowledged>0){
+           hostAckId=Math.max(hostAckId,acknowledged);
+           player.seq=Math.max(player.seq,next.seq);
+           if(acknowledged<hostCommandId)return;
+           // This is the latest command acknowledgement. The host's local audio
+           // remains the timing source for the next action, not this delayed echo.
+           applyPlayerVisibility();refreshProgress();return;
+         }
+         if(hostCommandId>hostAckId)return;
+         // Reconnecting after server reboot: restore the track explicitly.
+         if(!next.src&&player.src&&socket.readyState===WebSocket.OPEN){
+           const wasPlaying=player.playing;
+           publishPlayer('track');
+           if(wasPlaying)publishPlayer('play');
+           return;
+         }
+         if(next.src!==player.src||next.playing!==player.playing){syncPlayer(next,true)}
+         else{player.seq=Math.max(player.seq,next.seq);applyPlayerVisibility();refreshProgress()}
        }else if(guestApproved){acceptRemoteState(next,true)}
      };
      socket.onclose=event=>{
        if(socket!==musicWs)return;
        musicWs=null;musicConnecting=false;
-       syncText('⚠ Нет связи с Python-сервером. Переподключаемся…');
+       pythonLink('🔴 Python WebSocket отключён (код '+event.code+'). Повторное подключение…');
+       syncText('⚠ Нет связи с сервером музыки, пытаемся восстановить…');
        if(event.code===4409)musicNote('Ведущий уже открыл эту комнату в другой вкладке. Закрой лишнюю вкладку.');
        if(event.code===4404&&desiredMode==='host'){delete musicHostTokens[targetRoom];set('musicroom-python-host-tokens',musicHostTokens);}
        else if(event.code===4404)musicNote('Комната не создана на Python-сервере. Ведущий должен открыть сайт и создать новую комнату.');
      };
      socket.onerror=()=>{
-       if(socket===musicWs)syncText('⚠ WebSocket недоступен. Убедись, что сайт запущен на Python-сервере, а не на старом Netlify.');
+       if(socket===musicWs){pythonLink('🔴 Ошибка Python WebSocket — открой страницу Render, не Netlify');syncText('⚠ WebSocket недоступен. Проверь адрес сайта и работу Render.')}
      };
    }catch(err){
      musicConnecting=false;
-     syncText('⚠ Python-сервер: '+String(err.message||err));
+     pythonLink('🔴 Python-сервер: '+String(err.message||err));
+     syncText('⚠ Не удалось подключить музыку');
    }
  }
- setInterval(()=>{if(connected&&admitted())ensureMusicSocket()},2500);
+ setInterval(()=>{
+   if(!connected||!admitted())return;
+   ensureMusicSocket();
+   if(!isHost()&&musicWs?.readyState===WebSocket.OPEN&&Date.now()-lastServerRefresh>4000){
+     lastServerRefresh=Date.now();
+     musicWs.send(JSON.stringify({type:'get_state'}));
+   }
+ },2000);
  function invitationUrl(){
    if(!/^https?:$/.test(location.protocol))return '';
    const u=new URL(location.href);u.searchParams.set('room',room);
@@ -1096,6 +1190,11 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
    if(isSelf){const tag=document.createElement('span');tag.className='tag';tag.textContent='ты';outer.append(tag)}
    return outer;
  }
+ function updateHomePet(){
+   const stage=$('homePetStage');
+   if(!stage)return;
+   stage.replaceChildren(makePet(self,true));
+ }
  function render(){
    const others=users.filter(p=>p.sessionId!==sessionId && (p.host || (isHost()?approvedSessions.has(p.sessionId):guestApproved && users.some(h=>h.host && h.approvedIds.includes(p.sessionId))))).slice(0,5);
    for(const id of ['pets','roomPets']){
@@ -1103,6 +1202,7 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
      el.append(makePet(self,true));
      others.forEach(p=>el.append(makePet(p,false)));
    }
+   updateHomePet();
    const count=connected?1+others.length:1;
    $('count').textContent=`${count} участник${count%10===1&&count%100!==11?'':count%10>=2&&count%10<=4&&(count%100<12||count%100>14)?'а':'ов'}`;
    $('roomTitle').textContent='Комната '+room;
@@ -1292,6 +1392,82 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
  });
  setInterval(()=>{if(connected&&!isHost()&&!guestApproved)askToJoin()},4000);
  setInterval(()=>{if(isYoutube(player.src)&&!$('youtubeBox').hidden)refreshProgress()},700);
+
+ // v1.6: personal player is intentionally independent from the shared room player.
+ const homeAudio=$('homeAudio');
+ let localHomeFiles=[];
+ let homeSearchSerial=0;
+ const homeStatus=s=>{$('homeSearchStatus').textContent=s};
+ const homeText=(tag,content,className='')=>{const el=document.createElement(tag);if(className)el.className=className;el.textContent=content;return el};
+ function playHome(url,title,artist){
+   if(!url)return;
+   homeAudio.pause();
+   homeAudio.src=url;
+   $('homeNowPlaying').textContent=title;
+   $('homeNowArtist').textContent=artist||'Мои песни';
+   homeAudio.play().catch(()=>homeStatus('Нажми ▶ на плеере: браузер требует разрешения на воспроизведение.'));
+ }
+ homeAudio.addEventListener('error',()=>homeStatus('Не удалось открыть аудио. Попробуй другую песню или перейди на страницу исполнителя.'));
+ function homeLink(url,label){
+   if(typeof url!=='string'||!url.startsWith('https://'))return null;
+   const a=homeText('a',label);a.href=url;a.target='_blank';a.rel='noopener noreferrer';return a;
+ }
+ function homeResultItem(track){
+   const item=document.createElement('article');item.className='home-result';
+   let art;
+   if(track.artwork&&/^https:\/\//.test(track.artwork)){
+     art=document.createElement('img');art.src=track.artwork;art.loading='lazy';art.alt='Обложка';art.className='home-cover';
+   }else{art=homeText('span','♫','home-cover');art.style.display='grid';art.style.placeItems='center';}
+   const content=document.createElement('div');content.className='home-track-info';
+   content.append(homeText('div',track.title||'Без названия','home-track-title'),homeText('div',track.artist||'Исполнитель','home-track-artist'));
+   const actions=document.createElement('div');actions.className='home-track-actions';
+   if(track.stream){
+     const play=homeText('button','▶ Слушать','btn');play.type='button';play.addEventListener('click',()=>playHome(track.stream,track.title,track.artist));actions.append(play);
+   }
+   if(track.download){
+     const dl=homeLink(track.download,'↓ Скачать');if(dl){dl.title='Доступно, если автор разрешил скачивание';actions.append(dl)}
+   }
+   const open=homeLink(track.url||'',track.provider==='catalog'?'Открыть в Apple Music':'Открыть на Audius');
+   if(open)actions.append(open);
+   content.append(actions);item.append(art,content);return item;
+ }
+ $('homeSearchForm').addEventListener('submit',async event=>{
+   event.preventDefault();const q=$('homeQuery').value.trim();if(q.length<2){homeStatus('Введи минимум 2 символа.');return}
+   const source=$('homeSource').value;
+   const id=++homeSearchSerial;
+   $('homeSearchButton').disabled=true;homeStatus('Ищем «'+q+'»…');$('homeSearchResults').replaceChildren();
+   try{
+     const r=await fetch('/api/music/search?'+new URLSearchParams({q,source}),{headers:{Accept:'application/json'}});
+     const data=await r.json();
+     if(id!==homeSearchSerial)return;
+     if(!r.ok)throw Error(typeof data.detail==='string'?data.detail:'Каталог не ответил');
+     const found=Array.isArray(data.results)?data.results:[];
+     found.forEach(track=>$('homeSearchResults').append(homeResultItem(track)));
+     homeStatus(found.length?`Найдено песен: ${found.length}. ${source==='catalog'?'Открывай официальные страницы для прослушивания.':'Нажми «Слушать» для полного трека.'}`:'Ничего не найдено. Попробуй другое название или источник.');
+   }catch(err){if(id===homeSearchSerial)homeStatus('Ошибка поиска: '+String(err.message||err));}
+   finally{if(id===homeSearchSerial)$('homeSearchButton').disabled=false}
+ });
+ $('homeSource').addEventListener('change',()=>{homeSearchSerial++;$('homeSearchButton').disabled=false;$('homeSearchResults').replaceChildren();homeStatus($('homeSource').value==='audius'?'Audius: полные треки, скачивание только по разрешению автора.':'Каталог известных песен: ссылки на официальное прослушивание.')});
+ function renderHomeOwn(){
+   const root=$('homeOwnList');root.replaceChildren();
+   for(const track of localHomeFiles){
+     const row=document.createElement('div');row.className='home-own-item';row.append(homeText('span',track.name));
+     const act=document.createElement('div');act.className='home-track-actions';
+     const play=homeText('button','▶','btn secondary');play.type='button';play.title='Слушать';play.addEventListener('click',()=>playHome(track.url,track.name,'Моя песня'));act.append(play);
+     const download=homeText('a','↓ Скачать','home-small-link');download.href=track.url;download.download=track.name;act.append(download);
+     row.append(act);root.append(row);
+   }
+ }
+ $('homeOwnFiles').addEventListener('change',event=>{
+   localHomeFiles.forEach(f=>URL.revokeObjectURL(f.url));localHomeFiles=[];
+   for(const file of Array.from(event.target.files||[]).slice(0,20)){
+      if(!/\.(mp3|wav|m4a|ogg)$/i.test(file.name)){continue}
+      localHomeFiles.push({url:URL.createObjectURL(file),name:file.name});
+   }
+   if(localHomeFiles.length)renderHomeOwn();else homeStatus('Выбери MP3, M4A, WAV или OGG.');
+ });
+ window.addEventListener('pagehide',()=>localHomeFiles.forEach(f=>URL.revokeObjectURL(f.url)));
+
  // Sections are UI views only; Supabase remains connected in every tab.
  function showTab(name){
    const valid=['home','studio','room','pet'];
